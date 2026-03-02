@@ -1,0 +1,52 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Mirrors auth.users from Supabase Auth (only public profile data)
+model Profile {
+  id        String   @id @db.Uuid
+  full_name String?
+  email     String?  @unique
+  photoURL  String?  @map("photo_url")
+  status    String   @default("active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userRoles UserRole[]
+
+  @@map("profiles")
+}
+
+model UserInvitation {
+  email     String   @id
+  roleKey   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("user_invitations")
+}
+
+model Role {
+  id   String @id @default(uuid()) @db.Uuid
+  key  String @unique // "ADMIN" | "USER"
+  name String
+
+  userRoles UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  userId String @db.Uuid @map("user_id")
+  roleId String @db.Uuid @map("role_id")
+
+  profile Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role    Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
