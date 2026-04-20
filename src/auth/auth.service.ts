@@ -57,7 +57,7 @@ export class AuthService {
         await this.prisma
           .$executeRaw`DELETE FROM auth.users WHERE id=${userId}::uuid`;
         throw new UnauthorizedException(
-          'No account found for this email. Please contact an administrator.',
+          'No tienes permiso para acceder a este Sistema.',
         );
       }
 
@@ -67,7 +67,7 @@ export class AuthService {
 
       if (!role) {
         throw new UnauthorizedException(
-          'Assigned role not found. Please contact an administrator.',
+          'El rol asignado no existe. Por favor, contacta a un administrador.',
         );
       }
 
@@ -110,7 +110,7 @@ export class AuthService {
     if (!profile || profile.userRoles.length === 0) {
       this.logger.error(`User ${email} (${userId}) has profile but no roles.`);
       throw new UnauthorizedException(
-        'Your account has no defined roles. Please contact an administrator.',
+        'Tu cuenta no tiene roles definidos. Por favor, contacta a un administrador.',
       );
     }
 
